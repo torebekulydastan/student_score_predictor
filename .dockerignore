@@ -1,0 +1,16 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.git/
+.gitignore
+*.csv
+*.zip
+*.tar
+*.gz
+*.7z
+*.parquet
+*.log
+*.tmp
+.DS_Store
