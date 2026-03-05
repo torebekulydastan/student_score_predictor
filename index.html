@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Exam Score Predictor</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; max-width: 900px; }
+    h1 { margin-bottom: 8px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { display: block; font-size: 14px; margin-bottom: 6px; }
+    input, select { width: 100%; padding: 10px; font-size: 14px; }
+    .row { margin-bottom: 12px; }
+    button { padding: 10px 16px; font-size: 14px; cursor: pointer; }
+    .card { border: 1px solid #ddd; padding: 14px; border-radius: 10px; margin-top: 16px; }
+    .muted { color: #666; font-size: 13px; }
+    .error { color: #b00020; white-space: pre-wrap; }
+    .ok { color: #0b6b0b; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Student Exam Score Predictor</h1>
+  <div class="muted">Sends JSON to <code>POST /predict</code> and shows the predicted <code>exam_score</code>.</div>
+
+  <div class="card">
+    <form id="predictForm">
+      <div class="grid">
+
+        <div class="row">
+          <label for="Hours_Studied">Hours_Studied (int ≥ 0)</label>
+          <input id="Hours_Studied" type="number" min="0" step="1" value="5" required />
+        </div>
+
+        <div class="row">
+          <label for="Attendance">Attendance (int ≥ 0)</label>
+          <input id="Attendance" type="number" min="0" step="1" value="90" required />
+        </div>
+
+        <div class="row">
+          <label for="Sleep_Hours">Sleep_Hours (1..23)</label>
+          <input id="Sleep_Hours" type="number" min="1" max="23" step="1" value="7" required />
+        </div>
+
+        <div class="row">
+          <label for="Previous_Scores">Previous_Scores (int ≥ 0)</label>
+          <input id="Previous_Scores" type="number" min="0" step="1" value="75" required />
+        </div>
+
+        <div class="row">
+          <label for="Tutoring_Sessions">Tutoring_Sessions (int ≥ 0)</label>
+          <input id="Tutoring_Sessions" type="number" min="0" step="1" value="2" required />
+        </div>
+
+        <div class="row">
+          <label for="Physical_Activity">Physical_Activity (int ≥ 0)</label>
+          <input id="Physical_Activity" type="number" min="0" step="1" value="3" required />
+        </div>
+
+        <div class="row">
+          <label for="Parental_Involvement">Parental_Involvement</label>
+          <select id="Parental_Involvement" required>
+            <option>Low</option><option selected>High</option><option>Medium</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Access_to_Resources">Access_to_Resources</label>
+          <select id="Access_to_Resources" required>
+            <option>Low</option><option selected>Medium</option><option>High</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Extracurricular_Activities">Extracurricular_Activities</label>
+          <select id="Extracurricular_Activities" required>
+            <option selected>Yes</option><option>No</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Motivation_Level">Motivation_Level</label>
+          <select id="Motivation_Level" required>
+            <option>Low</option><option>Medium</option><option selected>High</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Internet_Access">Internet_Access</label>
+          <select id="Internet_Access" required>
+            <option selected>Yes</option><option>No</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Family_Income">Family_Income</label>
+          <select id="Family_Income" required>
+            <option>Low</option><option selected>Medium</option><option>High</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Teacher_Quality">Teacher_Quality</label>
+          <select id="Teacher_Quality" required>
+            <option>Low</option><option>Medium</option><option selected>High</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="School_Type">School_Type</label>
+          <select id="School_Type" required>
+            <option selected>Public</option><option>Private</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Peer_Influence">Peer_Influence</label>
+          <select id="Peer_Influence" required>
+            <option selected>Positive</option><option>Neutral</option><option>Negative</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Learning_Disabilities">Learning_Disabilities</label>
+          <select id="Learning_Disabilities" required>
+            <option selected>No</option><option>Yes</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Parental_Education_Level">Parental_Education_Level</label>
+          <select id="Parental_Education_Level" required>
+            <option>High School</option><option selected>College</option><option>Postgraduate</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Distance_from_Home">Distance_from_Home</label>
+          <select id="Distance_from_Home" required>
+            <option selected>Near</option><option>Moderate</option><option>Far</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="Gender">Gender</label>
+          <select id="Gender" required>
+            <option selected>Male</option><option>Female</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div style="margin-top: 12px; display:flex; gap:10px; align-items:center;">
+        <button type="submit">Predict</button>
+        <span id="status" class="muted"></span>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="muted">Request JSON</div>
+    <pre id="requestPreview"></pre>
+  </div>
+
+  <div class="card">
+    <div class="muted">Response</div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // Change this if your API runs elsewhere:
+    const API_BASE = "http://127.0.0.1:8000";
+
+    const form = document.getElementById("predictForm");
+    const statusEl = document.getElementById("status");
+    const resultEl = document.getElementById("result");
+    const requestPreviewEl = document.getElementById("requestPreview");
+
+    const fields = [
+      "Hours_Studied","Attendance","Parental_Involvement","Access_to_Resources",
+      "Extracurricular_Activities","Sleep_Hours","Previous_Scores","Motivation_Level",
+      "Internet_Access","Tutoring_Sessions","Family_Income","Teacher_Quality","School_Type",
+      "Peer_Influence","Physical_Activity","Learning_Disabilities","Parental_Education_Level",
+      "Distance_from_Home","Gender"
+    ];
+
+    function buildPayload() {
+      // ints:
+      const intFields = ["Hours_Studied","Attendance","Sleep_Hours","Previous_Scores","Tutoring_Sessions","Physical_Activity"];
+      const payload = {};
+      for (const f of fields) {
+        const el = document.getElementById(f);
+        let v = el.value;
+
+        if (intFields.includes(f)) v = Number.parseInt(v, 10);
+        payload[f] = v;
+      }
+      return payload;
+    }
+
+    function renderPreview() {
+      const payload = buildPayload();
+      requestPreviewEl.textContent = JSON.stringify(payload, null, 2);
+    }
+
+    fields.forEach(f => document.getElementById(f).addEventListener("change", renderPreview));
+    renderPreview();
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Sending request...";
+      resultEl.textContent = "";
+
+      const payload = buildPayload();
+      requestPreviewEl.textContent = JSON.stringify(payload, null, 2);
+
+      try {
+        const res = await fetch(`${API_BASE}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = text; }
+
+        if (!res.ok) {
+          statusEl.textContent = "Error";
+          resultEl.innerHTML = `<div class="error">HTTP ${res.status}\n${JSON.stringify(data, null, 2)}</div>`;
+          return;
+        }
+
+        statusEl.textContent = "OK";
+        const score = data.exam_score;
+        const ver = data.model_version ?? "N/A";
+
+        resultEl.innerHTML = `
+          <div class="ok"><b>Predicted exam_score:</b> ${score}</div>
+          <div class="muted">model_version: ${ver}</div>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      } catch (err) {
+        statusEl.textContent = "Error";
+        resultEl.innerHTML = `<div class="error">${err}</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
